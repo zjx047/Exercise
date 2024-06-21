@@ -1,25 +1,30 @@
 class CryptoWallet:
+    SUPPORTED_CURRENCIES = {'Bitcoin', 'Ethereum', 'Ripple', 'Litecoin'}
+
     def __init__(self, owner):
-        """Initialize a new CryptoWallet instance with owner's name, balances, and an empty transaction history."""
+        """Initialize a new CryptoWallet instance."""
         self.owner = owner
         self.balances = {}
         self.transactions = []
 
     def deposit(self, currency, amount):
-        """Deposit a specified amount of a cryptocurrency and record the transaction."""
+        """Deposit a specified amount of a supported cryptocurrency."""
+        if currency not in self.SUPPORTED_CURRENCIES:
+            print(f"Currency {currency} is not supported.")
+            return
         if amount > 0:
-            if currency in self.balances:
-                self.balances[currency] += amount
-            else:
-                self.balances[currency] = amount
+            self.balances[currency] = self.balances.get(currency, 0) + amount
             print(f"Deposited {amount} {currency}.")
             self.transactions.append((currency, amount, 'deposit'))
         else:
             print("Deposit amount must be positive.")
 
     def withdraw(self, currency, amount):
-        """Withdraw a specified amount of a cryptocurrency and record the transaction."""
-        if amount > 0 and currency in self.balances and self.balances[currency] >= amount:
+        """Withdraw a specified amount from the wallet if the currency is supported and funds are available."""
+        if currency not in self.SUPPORTED_CURRENCIES:
+            print(f"Currency {currency} is not supported.")
+            return
+        if amount > 0 and self.balances.get(currency, 0) >= amount:
             self.balances[currency] -= amount
             print(f"Withdrew {amount} {currency}.")
             self.transactions.append((currency, -amount, 'withdrawal'))
@@ -27,12 +32,11 @@ class CryptoWallet:
             print("Insufficient funds or currency not found.")
 
     def check_balance(self, currency):
-        """Return the current balance of a specific cryptocurrency."""
+        """Check the balance of a specific cryptocurrency, ensuring it's supported."""
+        if currency not in self.SUPPORTED_CURRENCIES:
+            print(f"Currency {currency} is not supported.")
+            return 0
         return self.balances.get(currency, 0)
-
-    def get_transaction_history(self):
-        """Return the transaction history."""
-        return self.transactions
 
 # Example usage:
 wallet = CryptoWallet("Alex")
